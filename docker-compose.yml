@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  spybot:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: spybot-telegram-bot
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+      - TZ=Europe/Kiev
+    restart: unless-stopped
+    volumes:
+      # Mount logs directory for persistent logs
+      - ./logs:/app/logs
+      # Optional: Mount config for settings persistence
+      - ./data:/app/data
+    networks:
+      - spybot-network
+    # Resource limits for NAS
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.5'
+        reservations:
+          memory: 128M
+          cpus: '0.25'
+    # Health check
+    healthcheck:
+      test: ["CMD", "node", "-e", "process.exit(0)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  spybot-network:
+    driver: bridge
+    name: spybot-network

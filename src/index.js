@@ -191,22 +191,34 @@ function updateGameMessage(chatId, game) {
   const joinUrl = `https://t.me/${process.env.BOT_USERNAME}?start=join_${chatId}`;
   console.log(`[UPDATE] Join button URL: ${joinUrl}`);
   
+  const keyboardRows = [
+    [
+      {
+        text: getTranslation('join_game_button', lang),
+        url: joinUrl
+      }
+    ],
+    [
+      {
+        text: getTranslation('view_players_button', lang),
+        callback_data: "view_players"
+      }
+    ]
+  ];
+
+  // Add start button if game can start and is not waiting to start
+  if (game.canStart() && !game.waitingToStart) {
+    keyboardRows.push([
+      {
+        text: getTranslation('start_game_button', lang),
+        callback_data: "start_game"
+      }
+    ]);
+  }
+
   const joinKeyboard = {
     reply_markup: {
-      inline_keyboard: [
-        [
-          {
-            text: getTranslation('join_game_button', lang),
-            url: joinUrl
-          }
-        ],
-        [
-          {
-            text: getTranslation('view_players_button', lang),
-            callback_data: "view_players"
-          }
-        ]
-      ]
+      inline_keyboard: keyboardRows
     }
   };
   
@@ -1738,6 +1750,87 @@ bot.on('callback_query', (callbackQuery) => {
       }
       bot.answerCallbackQuery(callbackQuery.id, {
         text: errorText,
+        show_alert: true
+      });
+    }
+  } else if (data === 'start_game') {
+    // Handle start game button
+    console.log(`[START-BUTTON] User ${username} (${userId}) pressed start game button`);
+    
+    if (!game.canStart()) {
+      console.log(`[START-BUTTON] REJECTED: Game cannot start`);
+      bot.answerCallbackQuery(callbackQuery.id, {
+        text: getTranslation('cannot_start_game', lang),
+        show_alert: true
+      });
+      return;
+    }
+    
+    if (game.isActive) {
+      console.log(`[START-BUTTON] REJECTED: Game already active`);
+      bot.answerCallbackQuery(callbackQuery.id, {
+        text: getTranslation('game_already_active', lang),
+        show_alert: true
+      });
+      return;
+    }
+    
+    console.log(`[START-BUTTON] Starting game via button...`);
+    
+    // Start the game
+    if (game.startGame()) {
+      console.log(`Game started via button by ${username}`);
+      
+      bot.answerCallbackQuery(callbackQuery.id, {
+        text: getTranslation('game_starting', lang)
+      });
+      
+      // Send roles to players
+      game.players.forEach(player => {
+        const playerRole = game.getPlayerRole(player.id);
+        const isSpy = game.isSpy(player.id);
+        
+        let roleMessage;
+        if (isSpy) {
+          const otherSpies = game.getSpies().filter(spy => spy.id !== player.id);
+          if (otherSpies.length > 0) {
+            const spyNames = otherSpies.map(spy => spy.username).join(', ');
+            roleMessage = getTranslation('spy_role_multi', lang, {
+              role: playerRole,
+              partners: spyNames
+            });
+          } else {
+            roleMessage = getTranslation('spy_role_single', lang, {
+              role: playerRole
+            });
+          }
+        } else {
+          roleMessage = getTranslation('agent_role', lang, {
+            role: playerRole,
+            location: game.getLocation()
+          });
+        }
+        
+        bot.sendMessage(player.id, roleMessage).catch((error) => {
+          console.log(`Failed to send role to ${player.username}: ${error.message}`);
+        });
+      });
+      
+      // Update the main message to show game started
+      updateGameMessage(chatId, game);
+      
+      // Send game started message
+      setTimeout(() => {
+        const gameStartMessage = getTranslation('game_has_started', lang, {
+          duration: game.getDuration(),
+          players: game.getPlayerCount()
+        });
+        sendAndTrackMessage(chatId, gameStartMessage);
+      }, 1000);
+    } else {
+      console.log(`Failed to start game via button`);
+      bot.answerCallbackQuery(callbackQuery.id, {
+        text: getTranslation('start_game_failed', lang),
         show_alert: true
       });
     }
