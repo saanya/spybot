@@ -13,7 +13,7 @@ Spyfall is a social deduction game where players try to identify the spy among t
 - **👥 Flexible Player Count**: 3-8 players with dynamic spy assignment
 - **⏰ Smart Timing**: Configurable game duration (1-20 minutes) with auto-start
 - **🎮 Interactive UI**: Inline keyboards for easy game joining
-- **🕵️ Spy Features**: Location guessing with `/loc` command for instant wins
+- **🕵️ Spy Features**: Role guessing with `/word` command for instant wins
 - **📱 Modern UX**: Real-time notifications and status updates
 
 ## 🚀 Quick Start
@@ -85,12 +85,12 @@ Spyfall is a social deduction game where players try to identify the spy among t
 - `/time` - Check remaining time
 - `/vote` - Start voting to eliminate a suspected spy
 - `/votes` - Check current voting status and results
-- `/loc [location]` - (Spies only) Guess the location
+- `/word [role]` - (Spies only) Guess the agent role
 - `/endgame` - End the current game
 
 ### Voting System
 
-- **Start Voting**: Use `/vote` to begin a 60-second voting period
+- **Start Voting**: Use `/vote` to begin a 30-second voting period
 - **Cast Vote**: Type a number (1, 2, 3...) to vote for that player
 - **Check Status**: Use `/votes` to see current vote counts
 - **Results**: Player with most votes gets eliminated
@@ -103,7 +103,7 @@ Spyfall is a social deduction game where players try to identify the spy among t
 3. **Auto-Start**: Game starts automatically 60 seconds after 3+ players join
 4. **Play**: Ask questions to find spies without revealing the location
 5. **Win Conditions**:
-   - **Spies win**: Correctly guess location with `/loc`
+   - **Spies win**: Correctly guess agent role with `/word`
    - **Agents win**: Identify all spies or time runs out
 
 ## 🏗️ Game Rules
@@ -181,7 +181,7 @@ npm run dev
 | `/startgame` | Start game manually | `/startgame` |
 | `/endgame` | End current game | `/endgame` |
 | `/time` | Check remaining time | `/time` |
-| `/loc` | Spy location guess | `/loc Банк` |
+| `/word` | Spy role guess | `/word Касир` |
 | `/settings` | View game settings | `/settings` |
 | `/settime` | Set game duration | `/settime 10` |
 | `/setlang` | Set language | `/setlang uk` |
@@ -199,7 +199,7 @@ npm run dev
 - Ask general questions that could apply anywhere
 - Give vague but plausible answers
 - Listen carefully to gather location clues
-- Use `/loc` when confident about the location
+- Use `/word` when confident about the agent role
 - If there are 2 spies, coordinate but don't make it obvious
 
 ## 🤝 Contributing
