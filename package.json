@@ -1,0 +1,20 @@
+{
+  "name": "spybot",
+  "version": "1.0.0",
+  "description": "Telegram bot for playing Spyfall game",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "dependencies": {
+    "node-telegram-bot-api": "^0.66.0",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.3"
+  },
+  "keywords": ["telegram", "bot", "spyfall", "game"],
+  "author": "",
+  "license": "MIT"
+}
