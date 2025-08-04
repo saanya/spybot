@@ -19,15 +19,13 @@ services:
       - ./data:/app/data
     networks:
       - spybot-network
-    # Resource limits for NAS
+    # Memory limits only (CPU limits removed for NAS compatibility)
     deploy:
       resources:
         limits:
           memory: 256M
-          cpus: '0.5'
         reservations:
           memory: 128M
-          cpus: '0.25'
     # Health check
     healthcheck:
       test: ["CMD", "node", "-e", "process.exit(0)"]
